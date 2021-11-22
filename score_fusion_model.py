@@ -81,14 +81,14 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
-    dataloader = dummy_data_loader(N=10, batch_size=2)
-    # dataset = SHRECLoader(framerate=32)
-    # dataloader = torch.utils.data.DataLoader(
-    #     dataset=shrec,
-    #     batch_size=4,
-    #     shuffle=True,
-    #     num_workers=0,
-    # )
+    # dataloader = dummy_data_loader(N=10, batch_size=2)
+    shrec = SHRECLoader(framerate=32)
+    dataloader = torch.utils.data.DataLoader(
+        dataset=shrec,
+        batch_size=4,
+        shuffle=True,
+        num_workers=0,
+    )
 
     for pt_clouds, depth_ims, labels in dataloader:
         pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)

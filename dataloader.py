@@ -22,17 +22,17 @@ class SHRECLoader(data.Dataset):
         splitLine = self.r.split(self.inputs_list[index])
         # label28 = int(splitLine[-3]) - 1
         label14 = int(splitLine[-4]) - 1
-        depth_images = np.load(
+        point_clouds = np.load(
             insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "Processed_", 9)
             + "/pts_label.npy")[:, :, :7]
 
-        depth_images = depth_images[self.key_frame_sampling(len(depth_images), self.framerate)]
+        point_clouds = point_clouds[self.key_frame_sampling(len(point_clouds), self.framerate)]
         for i in range(self.framerate):
-            depth_images[i, :, 3] = i
-        depth_images = np.dstack((depth_images, np.zeros_like(depth_images)))[:, :, :7]
-        depth_images = self.normalize(depth_images, self.framerate)
+            point_clouds[i, :, 3] = i
+        point_clouds = np.dstack((point_clouds, np.zeros_like(point_clouds)))[:, :, :7]
+        point_clouds = self.normalize(point_clouds, self.framerate)
 
-        point_clouds = np.load(
+        depth_images = np.load(
             insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "DepthProcessed_", 9)
             + "/depth_video.npy").astype('int64')
 
