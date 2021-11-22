@@ -1,7 +1,12 @@
+import re
 import torch
 import numpy as np
 from utils import *
 from torch.utils import data
+
+def insert(original, new, pos):
+    '''Inserts new inside original at pos.'''
+    return original[:pos] + new + original[pos:]
 
 class SHRECLoader(data.Dataset):
     def __init__(self, framerate, phase="train", datatype="depth", inputs_type="pts"):
@@ -10,7 +15,7 @@ class SHRECLoader(data.Dataset):
         self.inputs_type = inputs_type
         self.framerate = framerate
         self.inputs_list = self.get_inputs_list()
-        self.prefix = "/content/SHREC2017/gesture_{}/finger_{}/subject_{}/essai_{}"
+        self.prefix = "./SHREC2017/gesture_{}/finger_{}/subject_{}/essai_{}"
         self.r = re.compile('[ \t\n\r:]+')
         print(len(self.inputs_list))
         if phase == "train":
@@ -23,7 +28,7 @@ class SHRECLoader(data.Dataset):
         # label28 = int(splitLine[-3]) - 1
         label14 = int(splitLine[-4]) - 1
         point_clouds = np.load(
-            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "Processed_", 9)
+            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "Processed_", 2)
             + "/pts_label.npy")[:, :, :7]
 
         point_clouds = point_clouds[self.key_frame_sampling(len(point_clouds), self.framerate)]
@@ -33,13 +38,15 @@ class SHRECLoader(data.Dataset):
         point_clouds = self.normalize(point_clouds, self.framerate)
 
         depth_images = np.load(
-            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "DepthProcessed_", 9)
-            + "/depth_video.npy").astype('int64')
+            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "DepthProcessed_", 2)
+            + "/depth_video.npy").astype('float32')
 
+        # label14 = torch.from_numpy(label14).long()
+        # print(label14.dtype)
         return point_clouds, depth_images, label14, self.inputs_list[index]
 
     def get_inputs_list(self):
-        prefix = "/content/SHREC2017"
+        prefix = "./SHREC2017"
         if self.phase == "train":
             inputs_path = prefix + "/train_gestures.txt"
         if self.phase == "test":

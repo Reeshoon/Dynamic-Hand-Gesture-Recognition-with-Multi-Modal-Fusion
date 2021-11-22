@@ -90,7 +90,8 @@ if __name__ == "__main__":
         num_workers=0,
     )
 
-    for pt_clouds, depth_ims, labels in dataloader:
+    for pt_clouds, depth_ims, labels, _ in dataloader:
+        depth_ims = torch.unsqueeze(depth_ims, 2)
         pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
 
         optimizer.zero_grad()
