@@ -108,6 +108,7 @@ class PointLSTM(nn.Module):
         cur_layer_input = input_tensor.unsqueeze(-1)
         for layer_idx in range(self.num_layers):
             h, c = hidden_state[layer_idx]
+            h, c = h.to('cuda'), c.to('cuda')
             output_inner = []
             for t in range(seq_len):
                 past = 0 if t == 0 else t - 1

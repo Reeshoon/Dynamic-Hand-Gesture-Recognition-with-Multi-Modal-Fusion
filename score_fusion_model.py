@@ -68,7 +68,7 @@ def count_params(model):
 if __name__ == "__main__":
     print("Starting demo run:")
     
-    device = "cpu"
+    device = "cuda"
     model = PointDepthScoreFusion()
     model = model.to(device)
 
@@ -90,18 +90,21 @@ if __name__ == "__main__":
         num_workers=0,
     )
 
-    for pt_clouds, depth_ims, labels, _ in dataloader:
-        depth_ims = torch.unsqueeze(depth_ims, 2)
-        pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
+    n_epoch = 30;
+    for epoch in range(n_epoch):
+        for pt_clouds, depth_ims, labels, _ in dataloader:
+            depth_ims = torch.unsqueeze(depth_ims, 2)
+            pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
 
-        optimizer.zero_grad()
-        output = model(pt_clouds, depth_ims)
-        print(f"Shape of output: {output.shape}")
+            optimizer.zero_grad()
+            output = model(pt_clouds, depth_ims)
+            # print(f"Shape of output: {output.shape}")
 
-        loss = criterion(output, labels)
-        loss.backward()
-        optimizer.step()
+            loss = criterion(output, labels)
+            loss.backward()
+            optimizer.step()
 
-        print(f"[+] Successfully trained 1 step. Loss: {loss.item()}")
-
+            print(f"[+] Successfully trained 1 step. Loss: {loss.item()}")
+        print(f'Finished epoch: {epoch + 1}')
+        
     print("Completed demo run.")
