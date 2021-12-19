@@ -6,6 +6,8 @@ from models.motion import Motion
 from models.depthcrnn import DepthCRNN
 from dataloader import SHRECLoader
 import math
+import time
+import matplotlib.pyplot as plt
 
 class PointDepthScoreFusion(nn.Module):
     def __init__(self):
@@ -67,7 +69,7 @@ def count_params(model):
 
 if __name__ == "__main__":
     print("Starting demo run:")
-    
+
     device = "cuda"
     model = PointDepthScoreFusion()
     model = model.to(device)
@@ -91,7 +93,14 @@ if __name__ == "__main__":
     )
 
     n_epoch = 30;
+    accuracies = []
+    losses = []
+
     for epoch in range(n_epoch):
+        t0 = time.time()
+        acc = 0
+        avg_loss = 0
+
         for pt_clouds, depth_ims, labels, _ in dataloader:
             depth_ims = torch.unsqueeze(depth_ims, 2)
             pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
@@ -99,12 +108,29 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             output = model(pt_clouds, depth_ims)
             # print(f"Shape of output: {output.shape}")
-
+            correct = output.max(1)[1].eq(labels).sum()
+            acc += correct.item()
             loss = criterion(output, labels)
             loss.backward()
             optimizer.step()
+            avg_loss += loss.item()
 
-            print(f"[+] Successfully trained 1 step. Loss: {loss.item()}")
+            #print(f"[+] Successfully trained 1 step. Loss: {loss.item()}")
+
+        accuracies.append(acc/len(dataloader.dataset))
+        losses.append(avg_loss/len(dataloader))
+        log_dict = {"epoch": epoch, "time_per_epoch": time.time() - t0, "train_acc": acc/(len(dataloader.dataset)), "avg_loss_per_ep": avg_loss/len(dataloader)}
         print(f'Finished epoch: {epoch + 1}')
-        
+        print(log_dict)
+
+        #torch.save(model.state_dict(), '/content/test_repo/model_weights')
+
+    plt.plot(losses)
+    plt.plot(accuracies)
+    with open('accuracies.txt', 'w') as f:
+        for item in accuracies:
+            f.write("%s\n" % item)
+    with open('losses.txt', 'w') as f:
+        for item in losses:
+            f.write("%s\n" % item)
     print("Completed demo run.")
