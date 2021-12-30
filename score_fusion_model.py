@@ -5,6 +5,7 @@ from torch import nn, optim
 from models.motion import Motion
 from models.depthcrnn import DepthCRNN
 from dataloader import SHRECLoader
+from train_single import train
 import math
 import time
 import matplotlib.pyplot as plt
@@ -43,32 +44,15 @@ class PointDepthScoreFusion(nn.Module):
         x_fused = (x_ptcloud + x_depth) / 2
         return x_fused
 
-
-def dummy_data_loader(N, batch_size):
-    """Creates dummy data so that you can test the model."""
-    num_batches = math.ceil(N/batch_size)
-    num_frames = 32
-    num_points = 128
-    for i in range(num_batches):
-        dummy_point_clouds = torch.randn(batch_size, num_frames, 128, 4)
-        dummy_depth_images = torch.randn(batch_size, num_frames, 1, 50, 50)
-        labels = torch.randint(14, (batch_size,)).long()
-        yield dummy_point_clouds, dummy_depth_images, labels
-
-        def insert(original, new, pos):
-            '''Inserts new inside original at pos.'''
-            return original[:pos] + new + original[pos:]
-
-
 def count_params(model):
     return sum(map(lambda p: p.data.numel(), model.parameters()))
 
 ################################
-# demo run for the model
+# run for the model
 ################################
 
 if __name__ == "__main__":
-    print("Starting demo run:")
+    print("Starting run:")
 
     device = "cuda"
     model = PointDepthScoreFusion()
@@ -79,58 +63,47 @@ if __name__ == "__main__":
 
     print(f"Score fusion model has {num_params} parameters.")
 
-
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
     shrec = SHRECLoader(framerate=32)
-    dataloader = torch.utils.data.DataLoader(
-        dataset=shrec,
+    train_size = int(0.8 * len(shrec))
+    val_size = len(shrec) - train_size
+    train_set, val_set = torch.utils.data.random_split(shrec, [train_size, val_size])
+
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_set,
         batch_size=4,
         shuffle=True,
         num_workers=0,
     )
 
-    n_epoch = 30;
-    accuracies = []
-    losses = []
+    val_loader = torch.utils.data.DataLoader(
+        dataset=val_set,
+        batch_size=4,
+        shuffle=True,
+        num_workers=0,
+    )
 
-    for epoch in range(n_epoch):
-        t0 = time.time()
-        acc = 0
-        avg_loss = 0
+    # dataloader = torch.utils.data.DataLoader(
+    #     dataset=shrec,
+    #     batch_size=4,
+    #     shuffle=True,
+    #     num_workers=0,
+    # )
 
-        for pt_clouds, depth_ims, labels, _ in dataloader:
-            depth_ims = torch.unsqueeze(depth_ims, 2)
-            pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
-
-            optimizer.zero_grad()
-            output = model(pt_clouds, depth_ims)
-            # print(f"Shape of output: {output.shape}")
-            correct = output.max(1)[1].eq(labels).sum()
-            acc += correct.item()
-            loss = criterion(output, labels)
-            loss.backward()
-            optimizer.step()
-            avg_loss += loss.item()
-
-            #print(f"[+] Successfully trained 1 step. Loss: {loss.item()}")
-
-        accuracies.append(acc/len(dataloader.dataset))
-        losses.append(avg_loss/len(dataloader))
-        log_dict = {"epoch": epoch, "time_per_epoch": time.time() - t0, "train_acc": acc/(len(dataloader.dataset)), "avg_loss_per_ep": avg_loss/len(dataloader)}
-        print(f'Finished epoch: {epoch + 1}')
-        print(log_dict)
-
-        #torch.save(model.state_dict(), '/content/test_repo/model_weights')
-
+    accuracies, losses = train(model, train_loader, val_loader, criterion, 30)
     plt.plot(losses)
     plt.plot(accuracies)
+
     with open('accuracies.txt', 'w') as f:
         for item in accuracies:
             f.write("%s\n" % item)
     with open('losses.txt', 'w') as f:
         for item in losses:
             f.write("%s\n" % item)
-    print("Completed demo run.")
+    print("Completed run.")
+
+    # completed training
+    
