@@ -62,6 +62,7 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
 
     if epoch % 3 == 0:
         val_acc, val_loss = evaluate(model, val_loader, criterion, device)
+        print("val_acc =",val_accuracies," val_loss = ",val_losses)
         val_accuracies.append(val_acc)
         val_losses.append(val_loss)
         if val_acc > best_acc:
