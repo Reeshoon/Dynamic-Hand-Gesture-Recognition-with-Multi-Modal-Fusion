@@ -93,9 +93,15 @@ if __name__ == "__main__":
     #     num_workers=0,
     # )
 
-    accuracies, losses = train(model, train_loader, val_loader, criterion, 30)
+    accuracies, losses,val_accuracies,val_losses = train(model, train_loader, val_loader, criterion, 30, device)
     plt.plot(losses)
+    plt.show()
     plt.plot(accuracies)
+    plt.show()
+    plt.plot(val_losses)
+    plt.show()
+    plt.plot(val_accuracies)
+    plt.show()
 
     with open('accuracies.txt', 'w') as f:
         for item in accuracies:
@@ -106,4 +112,3 @@ if __name__ == "__main__":
     print("Completed run.")
 
     # completed training
-    

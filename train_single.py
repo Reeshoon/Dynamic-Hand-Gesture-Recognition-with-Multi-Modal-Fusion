@@ -1,13 +1,13 @@
 import torch
 from torch import nn, optim
-from models.motion import Motion
-from models.depthcrnn import DepthCRNN
-from dataloader import SHRECLoader
+from typing import Callable, Tuple
+from torch.utils.data import DataLoader
 import math
 import time
 import matplotlib.pyplot as plt
+import os
 
-def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable):
+def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, device: String):
     acc = 0
     avg_loss = 0
     model.eval()
@@ -26,14 +26,17 @@ def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable):
     avg_loss /= len(dataloader)
     return acc, avg_loss
 
-def train(model: nn.Module, train_loader: Dataloader, val_loader: DataLoader, criterion: Callable, n_epoch: int):
+def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: String):
     t0 = time.time()
     acc = 0
     avg_loss = 0
     best_acc = 0
+    os.mkdir('model_weights')
 
     accuracies = []
     losses = []
+    val_accuracies = []
+    val_losses = []
     model.train()
 
     for epoch in range(n_epoch):
@@ -58,9 +61,11 @@ def train(model: nn.Module, train_loader: Dataloader, val_loader: DataLoader, cr
         print(log_dict)
 
     if epoch % 3 == 0:
-        val_acc, val_loss = evaluate(model, val_loader, criterion)
+        val_acc, val_loss = evaluate(model, val_loader, criterion, device)
+        val_accuracies.append(val_acc)
+        val_losses.append(val_loss)
         if val_acc > best_acc:
             torch.save(model.state_dict(), './model_weights')
             best_acc = val_acc
 
-    return accuracies, losses
+    return accuracies, losses,val_accuracies,val_losses
