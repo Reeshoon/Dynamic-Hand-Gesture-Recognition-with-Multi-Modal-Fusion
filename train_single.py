@@ -7,7 +7,7 @@ import time
 import matplotlib.pyplot as plt
 import os
 
-def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, device: String):
+def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, device: str):
     acc = 0
     avg_loss = 0
     model.eval()
@@ -26,13 +26,10 @@ def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, devi
     avg_loss /= len(dataloader)
     return acc, avg_loss
 
-def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: String):
-    t0 = time.time()
-    acc = 0
-    avg_loss = 0
-    best_acc = 0
+def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: str):
+  
     os.mkdir('model_weights')
-
+    best_acc = 0
     accuracies = []
     losses = []
     val_accuracies = []
@@ -40,6 +37,10 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
     model.train()
 
     for epoch in range(n_epoch):
+        t0 = time.time()
+        acc = 0
+        avg_loss = 0
+        
         for pt_clouds, depth_ims, labels, _ in train_loader:
             depth_ims = torch.unsqueeze(depth_ims, 2)
             pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
@@ -60,12 +61,13 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
         print(f'Finished epoch: {epoch + 1}')
         print(log_dict)
 
-    if epoch % 3 == 0:
-        val_acc, val_loss = evaluate(model, val_loader, criterion, device)
-        val_accuracies.append(val_acc)
-        val_losses.append(val_loss)
-        if val_acc > best_acc:
-            torch.save(model.state_dict(), './model_weights')
-            best_acc = val_acc
+        if (epoch+1) % 3 == 0:
+            val_acc, val_loss = evaluate(model, val_loader, criterion, device)
+            val_accuracies.append(val_acc)
+            val_losses.append(val_loss)
+            print("Val loss: ",val_loss," Val acc: ",val_acc)
+            if val_acc > best_acc:
+                torch.save(model.state_dict(), './model_weights')
+                best_acc = val_acc
 
     return accuracies, losses,val_accuracies,val_losses

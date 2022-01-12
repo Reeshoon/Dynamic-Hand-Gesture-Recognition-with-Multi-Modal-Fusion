@@ -93,7 +93,7 @@ if __name__ == "__main__":
     #     num_workers=0,
     # )
 
-    accuracies, losses,val_accuracies,val_losses = train(model, train_loader, val_loader, criterion, 30, device)
+    accuracies, losses,val_accuracies,val_losses = train(model, train_loader, val_loader, criterion, optimizer, 30, device)
     plt.plot(losses)
     plt.show()
     plt.plot(accuracies)
