@@ -5,7 +5,7 @@ from torch import nn, optim
 from models.motion import Motion
 from models.depthcrnn import DepthCRNN
 from dataloader import SHRECLoader
-from train_single import train
+from train_single import train,test
 import math
 import time
 import matplotlib.pyplot as plt
@@ -86,6 +86,14 @@ if __name__ == "__main__":
         num_workers=0,
     )
 
+    test_set = SHRECLoader(framerate=32,phase='test')
+    test_loader = torch.utils.data.DataLoader(
+        dataset=test_set,
+        shuffle=True,
+        num_workers=0,
+    )
+
+
     # dataloader = torch.utils.data.DataLoader(
     #     dataset=shrec,
     #     batch_size=4,
@@ -94,6 +102,9 @@ if __name__ == "__main__":
     # )
 
     accuracies, losses,val_accuracies,val_losses = train(model, train_loader, val_loader, criterion, optimizer, 30, device)
+    test_acc, test_loss = test(model, criterion, test_loader,device)
+    print(accuracies, losses,val_accuracies,val_losses)
+    print("\nTest Accuracy : \nTest Loss : ",test_acc,test_loss)
     plt.plot(losses)
     plt.show()
     plt.plot(accuracies)

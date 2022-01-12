@@ -71,3 +71,7 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
                 best_acc = val_acc
 
     return accuracies, losses,val_accuracies,val_losses
+
+def test(model: nn.Module, criterion: Callable, test_loader: DataLoader,device: str):
+    test_acc, test_loss = evaluate(model, test_loader, criterion, device)
+    return test_acc,test_loss
