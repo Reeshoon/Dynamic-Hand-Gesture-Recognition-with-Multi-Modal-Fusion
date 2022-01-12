@@ -27,7 +27,8 @@ def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, devi
     return acc, avg_loss
 
 def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: str):
-  
+
+    os.mkdir('model_weights')
     best_acc = 0
     accuracies = []
     losses = []
@@ -60,7 +61,7 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
         print(f'Finished epoch: {epoch + 1}')
         print(log_dict)
 
-        if (epoch+1) % 3 == 0:
+        if (epoch+1) % 1 == 0:
             val_acc, val_loss = evaluate(model, val_loader, criterion, device)
             val_accuracies.append(val_acc)
             val_losses.append(val_loss)
