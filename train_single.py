@@ -60,13 +60,13 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
         print(f'Finished epoch: {epoch + 1}')
         print(log_dict)
 
-        if (epoch+1) % 1 == 0:
+        if (epoch+1) % 3 == 0:
             val_acc, val_loss = evaluate(model, val_loader, criterion, device)
             val_accuracies.append(val_acc)
             val_losses.append(val_loss)
             print("Val loss: ",val_loss," Val acc: ",val_acc)
             if val_acc > best_acc:
-                torch.save(model.state_dict(), 'model_weights/')
+                torch.save(model.state_dict(), './model_weights/best_model.pt')
                 best_acc = val_acc
 
     return accuracies, losses,val_accuracies,val_losses
