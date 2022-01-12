@@ -66,7 +66,7 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
             val_losses.append(val_loss)
             print("Val loss: ",val_loss," Val acc: ",val_acc)
             if val_acc > best_acc:
-                torch.save(model.state_dict(), './model_weights/')
+                torch.save(model.state_dict(), 'model_weights/')
                 best_acc = val_acc
 
     return accuracies, losses,val_accuracies,val_losses
