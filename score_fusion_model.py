@@ -5,7 +5,10 @@ from torch import nn, optim
 from models.motion import Motion
 from models.depthcrnn import DepthCRNN
 from dataloader import SHRECLoader
+from train_single import train
 import math
+import time
+import matplotlib.pyplot as plt
 
 class PointDepthScoreFusion(nn.Module):
     def __init__(self):
@@ -41,33 +44,16 @@ class PointDepthScoreFusion(nn.Module):
         x_fused = (x_ptcloud + x_depth) / 2
         return x_fused
 
-
-def dummy_data_loader(N, batch_size):
-    """Creates dummy data so that you can test the model."""
-    num_batches = math.ceil(N/batch_size)
-    num_frames = 32
-    num_points = 128
-    for i in range(num_batches):
-        dummy_point_clouds = torch.randn(batch_size, num_frames, 128, 4)
-        dummy_depth_images = torch.randn(batch_size, num_frames, 1, 50, 50)
-        labels = torch.randint(14, (batch_size,)).long()
-        yield dummy_point_clouds, dummy_depth_images, labels
-
-        def insert(original, new, pos):
-            '''Inserts new inside original at pos.'''
-            return original[:pos] + new + original[pos:]
-
-
 def count_params(model):
     return sum(map(lambda p: p.data.numel(), model.parameters()))
 
 ################################
-# demo run for the model
+# run for the model
 ################################
 
 if __name__ == "__main__":
-    print("Starting demo run:")
-    
+    print("Starting run:")
+
     device = "cuda"
     model = PointDepthScoreFusion()
     model = model.to(device)
@@ -77,34 +63,53 @@ if __name__ == "__main__":
 
     print(f"Score fusion model has {num_params} parameters.")
 
-
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
     shrec = SHRECLoader(framerate=32)
-    dataloader = torch.utils.data.DataLoader(
-        dataset=shrec,
+    train_size = int(0.8 * len(shrec))
+    val_size = len(shrec) - train_size
+    train_set, val_set = torch.utils.data.random_split(shrec, [train_size, val_size])
+
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_set,
         batch_size=4,
         shuffle=True,
         num_workers=0,
     )
 
-    n_epoch = 30;
-    for epoch in range(n_epoch):
-        for pt_clouds, depth_ims, labels, _ in dataloader:
-            depth_ims = torch.unsqueeze(depth_ims, 2)
-            pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
+    val_loader = torch.utils.data.DataLoader(
+        dataset=val_set,
+        batch_size=4,
+        shuffle=True,
+        num_workers=0,
+    )
 
-            optimizer.zero_grad()
-            output = model(pt_clouds, depth_ims)
-            # print(f"Shape of output: {output.shape}")
+    # dataloader = torch.utils.data.DataLoader(
+    #     dataset=shrec,
+    #     batch_size=4,
+    #     shuffle=True,
+    #     num_workers=0,
+    # )
 
-            loss = criterion(output, labels)
-            loss.backward()
-            optimizer.step()
+    accuracies, losses,val_accuracies,val_losses = train(model, train_loader, val_loader, criterion,optimizer, 30, device)
+    plt.plot(losses)
+    plt.show()
+    plt.plot(accuracies)
+    plt.show()
+    plt.plot(val_losses)
+    plt.show()
+    plt.plot(val_accuracies)
+    plt.show()
 
-            print(f"[+] Successfully trained 1 step. Loss: {loss.item()}")
-        print(f'Finished epoch: {epoch + 1}')
-        
-    print("Completed demo run.")
+    print(losses,accuracies,val_losses,val_accuracies)
+    with open('accuracies.txt', 'w') as f:
+        for item in accuracies:
+            f.write("%s\n" % item)
+    with open('losses.txt', 'w') as f:
+        for item in losses:
+            f.write("%s\n" % item)
+    print("Completed run.")
+
+    # completed training
