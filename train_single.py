@@ -40,6 +40,8 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
     model.train()
 
     for epoch in range(n_epoch):
+        acc = 0
+        avg_loss = 0
         for pt_clouds, depth_ims, labels, _ in train_loader:
             depth_ims = torch.unsqueeze(depth_ims, 2)
             pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
