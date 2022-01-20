@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from utils import *
 from torch.utils import data
+import albumentations as A
 
 def insert(original, new, pos):
     '''Inserts new inside original at pos.'''
@@ -40,6 +41,7 @@ class SHRECLoader(data.Dataset):
         depth_images = np.load(
             insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "DepthProcessed_", 2)
             + "/depth_video.npy").astype('float32')
+        depth_images = self.image_shift_scale_rotate(depth_images)
 
         # label14 = torch.from_numpy(label14).long()
         # print(label14.dtype)
@@ -91,3 +93,19 @@ class SHRECLoader(data.Dataset):
                 PointcloudToTensor(),
             ])
         return transform
+
+    def image_shift_scale_rotate(image_sequence: np.ndarray, shift_limit: float=0.05, scale_limit:float=0.05, rotate_limit: int = 10, p : float = 0.5):
+        """Shift scale and rotate image within a certain limit."""
+
+        transform = A.ReplayCompose([
+            A.ShiftScaleRotate(shift_limit=shift_limit, scale_limit=scale_limit, rotate_limit=rotate_limit, p=p)
+        ])
+
+        data = transform(image=image_sequence[0])
+        image_sequence[0] = data["image"]
+
+        # Use same params for all frames
+        for i in range(1, image_sequence.shape[0]):
+            image_sequence[i] = A.ReplayCompose.replay(data['replay'], image=image_sequence[i])["image"]
+
+        return image_sequence
