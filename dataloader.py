@@ -1,7 +1,7 @@
 import re
 
 from cv2 import phase
-from test_repo.train_single import train
+from train_single import train
 import torch
 import numpy as np
 from utils import *
