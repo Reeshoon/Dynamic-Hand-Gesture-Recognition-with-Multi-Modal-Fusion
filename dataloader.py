@@ -1,4 +1,7 @@
 import re
+
+from cv2 import phase
+from test_repo.train_single import train
 import torch
 import numpy as np
 from utils import *
@@ -41,8 +44,9 @@ class SHRECLoader(data.Dataset):
         depth_images = np.load(
             insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "DepthProcessed_", 2)
             + "/depth_video.npy").astype('float32')
-        depth_images = (depth_images / 255).astype(np.float32)
-        depth_images = self.image_shift_scale_rotate(depth_images)
+        if phase == 'train':
+            depth_images = (depth_images / 255).astype(np.float32)
+            depth_images = self.image_shift_scale_rotate(depth_images)
 
 
         # label14 = torch.from_numpy(label14).long()

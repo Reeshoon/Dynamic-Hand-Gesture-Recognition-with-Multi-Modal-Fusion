@@ -69,8 +69,9 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
             if val_acc > best_acc:
                 torch.save(model.state_dict(), './model_weights/best_model.pt')
                 best_acc = val_acc
+                best_model = model
 
-    return accuracies, losses,val_accuracies,val_losses
+    return accuracies, losses,val_accuracies,val_losses,best_model
 
 def test(model: nn.Module, criterion: Callable, test_loader: DataLoader,device: str):
     test_acc, test_loss = evaluate(model, test_loader, criterion, device)

@@ -9,6 +9,7 @@ from train_single import train,test
 import math
 import time
 import matplotlib.pyplot as plt
+import wandb
 
 class PointDepthScoreFusion(nn.Module):
     def __init__(self):
@@ -101,10 +102,12 @@ if __name__ == "__main__":
     #     num_workers=0,
     # )
 
-    accuracies, losses,val_accuracies,val_losses = train(model, train_loader, val_loader, criterion, optimizer, 30, device)
-    test_acc, test_loss = test(model, criterion, test_loader,device)
+    wandb.login()
+    with wandb.init(project='test-project-1', name=' ', config={"learning_rate": 0.001,"epochs": 30,"batch_size": 4}):
+        accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device)
+    test_acc, test_loss = test(best_model, criterion, test_loader,device)
     print(accuracies, losses,val_accuracies,val_losses)
-    print("\nTest Accuracy : \nTest Loss : ",test_acc,test_loss)
+    print("\nTest Accuracy :",test_acc,"\nTest Loss : ",test_loss)
     plt.plot(losses)
     plt.show()
     plt.plot(accuracies)
