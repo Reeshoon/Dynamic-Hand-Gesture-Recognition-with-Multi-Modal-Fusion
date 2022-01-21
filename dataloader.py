@@ -41,7 +41,9 @@ class SHRECLoader(data.Dataset):
         depth_images = np.load(
             insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "DepthProcessed_", 2)
             + "/depth_video.npy").astype('float32')
+        depth_images = (depth_images / 255).astype(np.float32)
         depth_images = self.image_shift_scale_rotate(depth_images)
+
 
         # label14 = torch.from_numpy(label14).long()
         # print(label14.dtype)
@@ -94,7 +96,7 @@ class SHRECLoader(data.Dataset):
             ])
         return transform
 
-    def image_shift_scale_rotate(image_sequence: np.ndarray, shift_limit: float=0.05, scale_limit:float=0.05, rotate_limit: int = 10, p : float = 0.5):
+    def image_shift_scale_rotate(self,image_sequence: np.ndarray, shift_limit: float=0.05, scale_limit:float=0.05, rotate_limit: int = 10, p : float = 0.5):
         """Shift scale and rotate image within a certain limit."""
 
         transform = A.ReplayCompose([
