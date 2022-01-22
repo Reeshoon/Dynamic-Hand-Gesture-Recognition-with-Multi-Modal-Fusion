@@ -9,6 +9,7 @@ from train_single import train,test
 import math
 import time
 import matplotlib.pyplot as plt
+import os
 import wandb
 
 class PointDepthScoreFusion(nn.Module):
@@ -101,11 +102,18 @@ if __name__ == "__main__":
     #     shuffle=True,
     #     num_workers=0,
     # )
+    os.environ["WANDB_API_KEY"] = "87fd3cc00cd83c882da8bf145ecc92d00dae8bf0"
+    config ={
+        "learning_rate": 0.001,
+        "epochs": 30,
+        "batch_size": 4,
+        "optimizer" : "adam",
+        "criterion" : "CrossEntropyLoss"
+    }
 
-    wandb.login()
-    with wandb.init(project='test-project-1', name=' ', config={"learning_rate": 0.001,"epochs": 30,"batch_size": 4}):
+    with wandb.init(project='thesis-test-1', name='Augmentation-Depth-Images', config=config):
         accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device)
-        wandb.log(accuracies, losses,val_accuracies,val_losses)
+        wandb.log({"accuracies":accuracies, "losses":losses,"val-acc":val_accuracies,"val-loss":val_losses})
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
     best_model.to_onnx()
