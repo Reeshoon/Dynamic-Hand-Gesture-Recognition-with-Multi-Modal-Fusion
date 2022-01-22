@@ -82,12 +82,14 @@ class SHRECLoader(data.Dataset):
     def normalize_depthim(self,image_sequence: np.ndarray):
 
         image_sequence = (image_sequence / 255).astype(np.float32)
-        data = self.transform_depthim(image=image_sequence[0])
-        image_sequence[0] = data["image"]
 
-        # Use same params for all frames
-        for i in range(1, image_sequence.shape[0]):
-            image_sequence[i] = A.ReplayCompose.replay(data['replay'], image=image_sequence[i])["image"]
+        if self.transform_depthim != None :
+            data = self.transform_depthim(image=image_sequence[0])
+            image_sequence[0] = data["image"]
+
+            # Use same params for all frames
+            for i in range(1, image_sequence.shape[0]):
+                image_sequence[i] = A.ReplayCompose.replay(data['replay'], image=image_sequence[i])["image"]
 
         return image_sequence
 
@@ -123,7 +125,7 @@ class SHRECLoader(data.Dataset):
         ])
 
         else:
-            transform = A.ReplayCompose([])
+            transform = None
         return transform
 
 
