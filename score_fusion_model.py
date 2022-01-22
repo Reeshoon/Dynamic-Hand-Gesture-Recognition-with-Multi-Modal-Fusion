@@ -116,9 +116,6 @@ if __name__ == "__main__":
         wandb.log({"accuracies":accuracies, "losses":losses,"val-acc":val_accuracies,"val-loss":val_losses})
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
-    best_model.to_onnx()
-    wandb.save("model.onnx")
-
     print(accuracies, losses,val_accuracies,val_losses)
     print("\nTest Accuracy :",test_acc,"\nTest Loss : ",test_loss)
     plt.plot(losses)
