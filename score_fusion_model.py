@@ -118,14 +118,18 @@ if __name__ == "__main__":
 
     print(accuracies, losses,val_accuracies,val_losses)
     print("\nTest Accuracy :",test_acc,"\nTest Loss : ",test_loss)
-    plt.plot(losses)
+    
+    plt.plot(accuracies,'r',label='train_acc')
+    plt.plot(val_accuracies,'g',label='val_acc')
+    plt.title('accuracies')
+    plt.legend(loc="lower right")
     plt.show()
-    plt.plot(accuracies)
+    plt.plot(val_losses,'b',label='val_loss')
+    plt.plot(losses,'y',label='train_loss')
+    plt.title('losses')
+    plt.legend(loc="upper right")
     plt.show()
-    plt.plot(val_losses)
-    plt.show()
-    plt.plot(val_accuracies)
-    plt.show()
+
 
     with open('accuracies.txt', 'w') as f:
         for item in accuracies:
