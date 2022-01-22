@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     print(f"Score fusion model has {num_params} parameters.")
 
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.1)
     criterion = nn.CrossEntropyLoss()
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
@@ -111,14 +111,13 @@ if __name__ == "__main__":
         "criterion" : "CrossEntropyLoss"
     }
 
-    with wandb.init(project='thesis-test-1', name='Augmentation-Depth-Images', config=config):
+    with wandb.init(project='thesis-test-2', name='AdamW with weight decay', config=config):
         accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device)
         wandb.log({"accuracies":accuracies, "losses":losses,"val-acc":val_accuracies,"val-loss":val_losses})
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
-    print(accuracies, losses,val_accuracies,val_losses)
     print("\nTest Accuracy :",test_acc,"\nTest Loss : ",test_loss)
-    
+
     plt.plot(accuracies,'r',label='train_acc')
     plt.plot(val_accuracies,'g',label='val_acc')
     plt.title('accuracies')
