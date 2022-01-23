@@ -11,6 +11,7 @@ import time
 import matplotlib.pyplot as plt
 import os
 import wandb
+from loss import LabelSmoothingLoss
 
 class PointDepthScoreFusion(nn.Module):
     def __init__(self):
@@ -65,10 +66,10 @@ if __name__ == "__main__":
 
     print(f"Score fusion model has {num_params} parameters.")
 
-    #optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.1)
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    criterion = nn.CrossEntropyLoss()
-    #criterion = LabelSmoothingLoss(num_classes=config["hparams"]["model"]["num_classes"], smoothing=config["hparams"]["l_smooth"])
+    # optimizer = optim.Adam(model.parameters(), lr=0.001)
+    # criterion = nn.CrossEntropyLoss()
+    optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.1)
+    criterion = LabelSmoothingLoss(num_classes= 14 , smoothing=0.1)
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
     shrec = SHRECLoader(framerate=32)
