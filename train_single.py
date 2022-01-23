@@ -43,6 +43,10 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
         
         for pt_clouds, depth_ims, labels, _ in train_loader:
 
+            depth_ims = torch.unsqueeze(depth_ims, 2)
+            pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
+
+            optimizer.zero_grad()
             # schedulers          
             if schedulers["warmup"] is not None and epoch < 10:
                 schedulers["warmup"].step()
@@ -50,10 +54,6 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
             elif schedulers["scheduler"] is not None and epoch >= 10:
                 schedulers["scheduler"].step()        
 
-            depth_ims = torch.unsqueeze(depth_ims, 2)
-            pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
-
-            optimizer.zero_grad()
             output = model(pt_clouds, depth_ims)
             correct = output.max(1)[1].eq(labels).sum()
             acc += correct.item()
