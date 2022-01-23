@@ -113,7 +113,7 @@ if __name__ == "__main__":
         "scheduler": None
     }
     schedulers["warmup"] = WarmUpLR(optimizer, total_iters=len(train_loader) * 10)
-    total_iters = len(train_loader) * max(1, (30 - 10))
+    total_iters = len(train_loader) * max(1, (50 - 10))
     schedulers["scheduler"] = get_scheduler(optimizer, "cosine_annealing", total_iters)
 
 
@@ -126,8 +126,8 @@ if __name__ == "__main__":
         "criterion" : "LabelSmoothingLoss"
     }
 
-    with wandb.init(project='thesis-test-1', name='Added Scheduler', config=config):
-        accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device,schedulers)
+    with wandb.init(project='thesis-test-1', name='50-epoch', config=config):
+        accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 50, device,schedulers)
         wandb.log({"accuracies":accuracies, "losses":losses,"val-acc":val_accuracies,"val-loss":val_losses})
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
