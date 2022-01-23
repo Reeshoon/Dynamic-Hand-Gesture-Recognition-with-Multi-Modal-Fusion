@@ -26,7 +26,7 @@ def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, devi
     avg_loss /= len(dataloader)
     return acc, avg_loss
 
-def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: str):
+def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: str,schedulers: dict):
 
     os.mkdir('model_weights')
     best_acc = 0
@@ -42,6 +42,14 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
         avg_loss = 0
         
         for pt_clouds, depth_ims, labels, _ in train_loader:
+
+            # schedulers          
+            if schedulers["warmup"] is not None and epoch < 10:
+                schedulers["warmup"].step()
+            
+            elif schedulers["scheduler"] is not None and epoch >= 10:
+                schedulers["scheduler"].step()        
+
             depth_ims = torch.unsqueeze(depth_ims, 2)
             pt_clouds, depth_ims, labels = pt_clouds.to(device), depth_ims.to(device), labels.to(device)
 

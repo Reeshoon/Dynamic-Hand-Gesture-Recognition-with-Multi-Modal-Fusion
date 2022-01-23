@@ -11,7 +11,8 @@ import time
 import matplotlib.pyplot as plt
 import os
 import wandb
-from loss import LabelSmoothingLoss
+from utils.loss import LabelSmoothingLoss
+from utils.scheduler import WarmUpLR, get_scheduler
 
 class PointDepthScoreFusion(nn.Module):
     def __init__(self):
@@ -105,17 +106,28 @@ if __name__ == "__main__":
     #     shuffle=True,
     #     num_workers=0,
     # )
+
+    # lr scheduler
+    schedulers = {
+        "warmup": None,
+        "scheduler": None
+    }
+    schedulers["warmup"] = WarmUpLR(optimizer, total_iters=len(train_loader) * 10)
+    total_iters = len(train_loader) * max(1, (30 - 10))
+    schedulers["scheduler"] = get_scheduler(optimizer, "cosine_annealing", total_iters)
+
+
     os.environ["WANDB_API_KEY"] = "87fd3cc00cd83c882da8bf145ecc92d00dae8bf0"
     config ={
         "learning_rate": 0.001,
         "epochs": 30,
         "batch_size": 4,
-        "optimizer" : "adam",
-        "criterion" : "CrossEntropyLoss"
+        "optimizer" : "adamW",
+        "criterion" : "LabelSmoothingLoss"
     }
 
-    with wandb.init(project='thesis-test-1', name='Augmentation Depth images', config=config):
-        accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device)
+    with wandb.init(project='thesis-test-1', name='Added Scheduler', config=config):
+        accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device,schedulers)
         wandb.log({"accuracies":accuracies, "losses":losses,"val-acc":val_accuracies,"val-loss":val_losses})
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
