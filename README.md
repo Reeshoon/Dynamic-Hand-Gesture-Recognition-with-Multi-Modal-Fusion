@@ -5,7 +5,7 @@ See the `PointDepthScoreFusion` class in [score_fusion_model.py](./score_fusion_
 To see an example of using it, run:
 
 ```
-python score_fusion_model.py
+python main.py
 ```
 
 This will:
