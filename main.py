@@ -1,11 +1,8 @@
-"""Straightforward example on setting up the score fusion model."""
-
 import torch
 from torch import nn, optim
-from models.motion import Motion
-from models.depthcrnn import DepthCRNN
+from models.score_fusion_model import PointDepthScoreFusion
 from dataloader import SHRECLoader
-from train_single import train,test
+from train import train,test
 import math
 import time
 import matplotlib.pyplot as plt
@@ -13,63 +10,32 @@ import os
 import wandb
 from utils.loss import LabelSmoothingLoss
 from utils.scheduler import WarmUpLR, get_scheduler
-
-class PointDepthScoreFusion(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-        self.point_lstm_model=Motion(
-            num_classes=14,
-            pts_size=128,
-            offsets=False,
-            topk=16, downsample=(2, 2, 2),
-            knn=[16, 24, 48, 12]
-        )
-
-        self.depth_crnn_model=DepthCRNN(
-            num_classes=14,
-            conv_blocks=[8, 16, 32],
-            res_in=[50, 50],
-            T=32,
-            mlp_layers=[128],
-            drop_prb=0.5,
-            lstm_units=128,
-            lstm_layers=2,
-            use_bilstm=True,
-            use_bn=True,
-            actn_type="relu"
-        )
-
-    def forward(self, x_ptcloud, x_depth):
-
-        x_ptcloud = self.point_lstm_model(x_ptcloud)
-        x_depth = self.depth_crnn_model(x_depth)
-
-        x_fused = (x_ptcloud + x_depth) / 2
-        return x_fused
-
-def count_params(model):
-    return sum(map(lambda p: p.data.numel(), model.parameters()))
-
+from utils.misc import count_params
 ################################
 # run for the model
 ################################
 
-if __name__ == "__main__":
-    print("Starting run:")
-
+def training_pipeline():
     device = "cuda"
     model = PointDepthScoreFusion()
     model = model.to(device)
 
     print("Successfully created score fusion model")
     num_params = count_params(model)
-
     print(f"Score fusion model has {num_params} parameters.")
 
+    
+    #############################################
+    ###########  Optimizer Definition  ###########
+    #############################################
+    
     # optimizer = optim.Adam(model.parameters(), lr=0.001)
-    # criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.1)
+
+    #############################################
+    ###########  Criterion Definition  ###########
+    #############################################
+    # criterion = nn.CrossEntropyLoss()
     criterion = LabelSmoothingLoss(num_classes= 14 , smoothing=0.1)
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
@@ -99,25 +65,19 @@ if __name__ == "__main__":
         num_workers=0,
     )
 
-
-    # dataloader = torch.utils.data.DataLoader(
-    #     dataset=shrec,
-    #     batch_size=4,
-    #     shuffle=True,
-    #     num_workers=0,
-    # )
-
     # lr scheduler
     schedulers = {
         "warmup": None,
         "scheduler": None
     }
     schedulers["warmup"] = WarmUpLR(optimizer, total_iters=len(train_loader) * 10)
-    total_iters = len(train_loader) * max(1, (50 - 10))
+    total_iters = len(train_loader) * max(1, (30 - 10))
     schedulers["scheduler"] = get_scheduler(optimizer, "cosine_annealing", total_iters)
 
 
     os.environ["WANDB_API_KEY"] = "87fd3cc00cd83c882da8bf145ecc92d00dae8bf0"
+
+    #Adjust confugs for each training
     config ={
         "learning_rate": 0.001,
         "epochs": 30,
@@ -126,9 +86,8 @@ if __name__ == "__main__":
         "criterion" : "LabelSmoothingLoss"
     }
 
-    with wandb.init(project='thesis-test-1', name='50-epoch', config=config):
-        accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 50, device,schedulers)
-        wandb.log({"accuracies":accuracies, "losses":losses,"val-acc":val_accuracies,"val-loss":val_losses})
+    with wandb.init(project='thesis-test-1', name='128-point-clouds', config=config):
+        accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device,schedulers,config)
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
     print("\nTest Accuracy :",test_acc,"\nTest Loss : ",test_loss)
@@ -154,3 +113,11 @@ if __name__ == "__main__":
     print("Completed run.")
 
     # completed training
+
+
+
+if __name__ == "__main__":
+    print("Starting run:")
+    training_pipeline()
+
+    
