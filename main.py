@@ -96,12 +96,14 @@ def training_pipeline():
     plt.plot(val_accuracies,'g',label='val_acc')
     plt.title('accuracies')
     plt.legend(loc="lower right")
+
     plt.show()
     plt.plot(val_losses,'b',label='val_loss')
     plt.plot(losses,'y',label='train_loss')
     plt.title('losses')
     plt.legend(loc="upper right")
     plt.show()
+
 
 
     with open('accuracies.txt', 'w') as f:

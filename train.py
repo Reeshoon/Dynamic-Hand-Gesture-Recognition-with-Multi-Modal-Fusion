@@ -28,7 +28,6 @@ def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, devi
     return acc, avg_loss
 
 def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: str,schedulers: dict,config):
-
     best_acc = 0
     accuracies = []
     losses = []
@@ -66,6 +65,9 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
 
             avg_loss += loss.item()
 
+        print(acc)
+        print(len(train_loader.dataset))
+
         # after each epoch
         accuracies.append(acc/len(train_loader.dataset))
         losses.append(avg_loss/len(train_loader))
@@ -88,6 +90,7 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
                 save_model(epoch, save_path, model, optimizer, log_file) # save best val ckpt
 
     return accuracies, losses,val_accuracies,val_losses,best_model
+
 
 def test(model: nn.Module, criterion: Callable, test_loader: DataLoader,device: str):
     test_acc, test_loss = evaluate(model, test_loader, criterion, device)
