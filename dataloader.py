@@ -35,7 +35,7 @@ class SHRECLoader(data.Dataset):
         label14 = int(splitLine[-4]) - 1
 
         point_clouds = np.load(
-            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "Processed_", 2)
+            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "128Points_Processed_", 2)
             + "/pts_label.npy")[:, :, :7]
 
         point_clouds = point_clouds[self.key_frame_sampling(len(point_clouds), self.framerate)]
