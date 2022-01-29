@@ -28,6 +28,8 @@ def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, devi
     return acc, avg_loss
 
 def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: str,schedulers: dict,config):
+    if not os.path.isfile('./saved_files/'):
+        os.mkdir('saved_files')
     best_acc = 0
     accuracies = []
     losses = []
@@ -65,9 +67,6 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
 
             avg_loss += loss.item()
 
-        print(acc)
-        print(len(train_loader.dataset))
-
         # after each epoch
         accuracies.append(acc/len(train_loader.dataset))
         losses.append(avg_loss/len(train_loader))
@@ -86,7 +85,7 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
             if val_acc > best_acc:
                 best_acc = val_acc
                 best_model = model
-                save_path = os.path.join(config["exp"]["save_dir"], "best.pth")
+                save_path = os.path.join('./saved_files/', "best.pth")
                 save_model(epoch, save_path, model, optimizer, log_file) # save best val ckpt
 
     return accuracies, losses,val_accuracies,val_losses,best_model
