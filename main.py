@@ -86,7 +86,7 @@ def training_pipeline():
         "criterion" : "LabelSmoothingLoss"
     }
 
-    with wandb.init(project='thesis-test-1', name='Score Fusion Max', config=config):
+    with wandb.init(project='thesis-test-1', name='Depth Image Quantization', config=config):
         accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device,schedulers,config)
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
