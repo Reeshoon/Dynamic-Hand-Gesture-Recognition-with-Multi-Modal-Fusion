@@ -86,7 +86,7 @@ def training_pipeline():
         "criterion" : "LabelSmoothingLoss"
     }
 
-    with wandb.init(project='thesis-test-1', name='128-point-clouds', config=config):
+    with wandb.init(project='thesis-test-1', name='Score Fusion Max', config=config):
         accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device,schedulers,config)
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
@@ -104,14 +104,6 @@ def training_pipeline():
     plt.legend(loc="upper right")
     plt.show()
 
-
-
-    with open('accuracies.txt', 'w') as f:
-        for item in accuracies:
-            f.write("%s\n" % item)
-    with open('losses.txt', 'w') as f:
-        for item in losses:
-            f.write("%s\n" % item)
     print("Completed run.")
 
     # completed training

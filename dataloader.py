@@ -35,7 +35,7 @@ class SHRECLoader(data.Dataset):
         label14 = int(splitLine[-4]) - 1
 
         point_clouds = np.load(
-            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "128Points_Processed_", 2)
+            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "Processed_", 2)
             + "/pts_label.npy")[:, :, :7]
 
         point_clouds = point_clouds[self.key_frame_sampling(len(point_clouds), self.framerate)]
@@ -81,6 +81,11 @@ class SHRECLoader(data.Dataset):
     
     def normalize_depthim(self,image_sequence: np.ndarray):
 
+        # for i in range(1, image_sequence.shape[0]):
+        #     if image_sequence[i]<200:
+        #         image_sequence[i] = 0
+        #     else:
+        #         image_sequence[i] = 155 + (10 * (image_sequence[i] - min(image_sequence)) / (max(image_sequence) - min(image_sequence)) + 0.5) * ((255 - 155) / 10)
         image_sequence = (image_sequence / 255).astype(np.float32)
 
         if self.transform_depthim != None :
@@ -118,7 +123,7 @@ class SHRECLoader(data.Dataset):
         return transform
     
     @staticmethod
-    def transform_init_depthim(phase,shift_limit: float=0.05, scale_limit:float=0.05, rotate_limit: int = 10, p : float = 0.5):
+    def transform_init_depthim(phase,shift_limit: float=0.2, scale_limit:float=0.2, rotate_limit: int = 20, p : float = 0.5):
         if phase == 'train':
             transform = A.ReplayCompose([
             A.ShiftScaleRotate(shift_limit=shift_limit, scale_limit=scale_limit, rotate_limit=rotate_limit, p=p)
