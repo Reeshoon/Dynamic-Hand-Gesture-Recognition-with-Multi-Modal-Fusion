@@ -13,7 +13,7 @@ class PointDepthScoreFusion(nn.Module):
 
         self.point_lstm_model=Motion(
             num_classes=14,
-            pts_size=256,
+            pts_size=128,
             offsets=False,
             topk=16, downsample=(2, 2, 2),
             knn=[16, 24, 48, 12]
