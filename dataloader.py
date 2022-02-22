@@ -102,9 +102,21 @@ class SHRECLoader(data.Dataset):
             data = self.transform_depthim(image=image_sequence[0])
             image_sequence[0] = data["image"]
 
-            # Use same params for all frames
+            # Use same params for all frames, shift scale rotate
             for i in range(1, image_sequence.shape[0]):
                 image_sequence[i] = A.ReplayCompose.replay(data['replay'], image=image_sequence[i])["image"]
+
+            #time shift augmentation
+            if np.random.random() >= 0.5:
+                return image_sequence
+        
+            shift = np.random.randint(-0.1, 0.1)
+
+            if shift < 0: # cut off some start frames
+                image_sequence = image_sequence[-shift:]
+
+            elif shift > 0: # cut off some end frames
+                image_sequence = image_sequence[:-shift]
 
         return image_sequence
 
@@ -138,7 +150,6 @@ class SHRECLoader(data.Dataset):
             transform = A.ReplayCompose([
             A.ShiftScaleRotate(shift_limit=shift_limit, scale_limit=scale_limit, rotate_limit=rotate_limit, p=p)
         ])
-
         else:
             transform = None
         return transform
