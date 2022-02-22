@@ -25,16 +25,12 @@ def training_pipeline():
     print(f"Score fusion model has {num_params} parameters.")
 
     
-    #############################################
+
     ###########  Optimizer Definition  ###########
-    #############################################
-    
     # optimizer = optim.Adam(model.parameters(), lr=0.001)
     optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.1)
 
-    #############################################
     ###########  Criterion Definition  ###########
-    #############################################
     # criterion = nn.CrossEntropyLoss()
     criterion = LabelSmoothingLoss(num_classes= 14 , smoothing=0.1)
 
