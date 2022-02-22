@@ -87,7 +87,6 @@ class SHRECLoader(data.Dataset):
             mask = image_sequence[i] >= 200
             if np.any(mask):
                 d_min = image_sequence[i][mask].min()
-                print(d_min)
             else:
                 d_min = 0
 
