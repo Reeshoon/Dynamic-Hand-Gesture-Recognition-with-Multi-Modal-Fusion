@@ -82,13 +82,20 @@ class SHRECLoader(data.Dataset):
     def normalize_depthim(self,image_sequence: np.ndarray):
 
         for i in range(0, image_sequence.shape[0]):
-            ind1 = np.where(image_sequence[i]<200)
-            image_sequence[i][ind1]=0
             
-            ind2 = np.where(image_sequence[i]>=200)
-            d_max = np.amax(image_sequence[i][ind2])
-            d_min = np.amin(image_sequence[i][ind2])
-            image_sequence[i][ind2] = 155 + np.round(10 * ((image_sequence[i][ind2] - d_min) /(d_max - d_min) )) * int((255 - 155) / 10) 
+            d_max = max(1, image_sequence[i].max())
+            mask = image_sequence[i] >= 200
+            if np.any(mask):
+                d_min = image_sequence[i][mask].min()
+                print(d_min)
+            else:
+                d_min = 0
+
+            mask0 = image_sequence[i]<200
+            if np.any(mask0):
+                image_sequence[i][mask0]=0
+            
+            image_sequence[i][mask] = 155 + np.round(10 * ((image_sequence[i][mask] - d_min) /(d_max - d_min) )) * int((255 - 155) / 10) 
 
         image_sequence = (image_sequence / 255).astype(np.float32)
 
