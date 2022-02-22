@@ -121,7 +121,7 @@ class SHRECLoader(data.Dataset):
             num_frames = image_sequence.shape[0]
         
             if num_frames < 32:
-                image_sequence = np.pad(image_sequence, ((0, self.T - num_frames), (0, 0), (0, 0), (0, 0)), mode="constant")
+                image_sequence = np.pad(image_sequence, ((0, 32 - num_frames), (0, 0), (0, 0), (0, 0)), mode="constant")
 
         return image_sequence
 
