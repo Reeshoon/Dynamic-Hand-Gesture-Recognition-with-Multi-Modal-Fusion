@@ -72,7 +72,6 @@ def training_pipeline():
 
 
     os.environ["WANDB_API_KEY"] = "87fd3cc00cd83c882da8bf145ecc92d00dae8bf0"
-
     #Adjust confugs for each training
     config ={
         "learning_rate": 0.001,
