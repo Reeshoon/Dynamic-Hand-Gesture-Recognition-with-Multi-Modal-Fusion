@@ -5,7 +5,7 @@ from torch import nn, optim
 import numpy as np
 import random
 import os
-import wandb
+#import wandb
 
 # def seed_everything(seed: str) -> None:
 #     """Set manual seed.
@@ -59,7 +59,7 @@ def log(log_dict: dict, step: int, config: dict) -> None:
         config (dict): Config dict.
     """
     # send logs to wandb tracking server
-    wandb.log(log_dict, step=step)
+    #wandb.log(log_dict, step=step)
 
     log_message = f"Step: {step} | " + " | ".join([f"{k}: {v}" for k, v in log_dict.items()])
     log_file = os.path.join('./saved_files/', "training_log.txt")
