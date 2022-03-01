@@ -110,7 +110,7 @@ class SHRECLoader(data.Dataset):
             if np.random.random() >= 0.5:
                 return image_sequence
         
-            shift = np.random.randrange(-3, 3)
+            shift = np.random.randint(-3, 3)
 
             if shift < 0: # cut off some start frames
                 image_sequence = image_sequence[-shift:]
