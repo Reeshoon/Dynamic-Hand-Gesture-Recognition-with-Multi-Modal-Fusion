@@ -28,7 +28,7 @@ def training_pipeline():
 
     ###########  Optimizer Definition  ###########
     # optimizer = optim.Adam(model.parameters(), lr=0.001)
-    optimizer = optim.AdamW(model.parameters(), lr=0.0003, weight_decay=0.1)
+    optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=0.1)
 
     ###########  Criterion Definition  ###########
     # criterion = nn.CrossEntropyLoss()
@@ -36,7 +36,7 @@ def training_pipeline():
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
     shrec = SHRECLoader(framerate=32)
-    train_size = int(0.9 * len(shrec))
+    train_size = int(0.8 * len(shrec))
     val_size = len(shrec) - train_size
     train_set, val_set = torch.utils.data.random_split(shrec, [train_size, val_size])
 
