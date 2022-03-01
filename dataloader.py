@@ -110,7 +110,7 @@ class SHRECLoader(data.Dataset):
             if np.random.random() >= 0.5:
                 return image_sequence
         
-            shift = np.random.randint(-3, 3)
+            shift = np.random.randrange(-3, 3)
 
             if shift < 0: # cut off some start frames
                 image_sequence = image_sequence[-shift:]
@@ -150,7 +150,7 @@ class SHRECLoader(data.Dataset):
         return transform
     
     @staticmethod
-    def transform_init_depthim(phase,shift_limit: float=0.2, scale_limit:float=0.2, rotate_limit: int = 20, p : float = 0.5):
+    def transform_init_depthim(phase,shift_limit: float=0.25, scale_limit:float=0.25, rotate_limit: int = 20, p : float = 0.5):
         if phase == 'train':
             transform = A.ReplayCompose([
             A.ShiftScaleRotate(shift_limit=shift_limit, scale_limit=scale_limit, rotate_limit=rotate_limit, p=p)
