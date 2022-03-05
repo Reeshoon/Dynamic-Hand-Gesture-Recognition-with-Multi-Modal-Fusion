@@ -10,12 +10,13 @@ import os
 #import wandb
 from utils.loss import LabelSmoothingLoss
 from utils.scheduler import WarmUpLR, get_scheduler
-from utils.misc import count_params
+from utils.misc import count_params,seed_everything
 ################################
 # run for the model
 ################################
 
 def training_pipeline():
+    seed_everything(0)
     device = "cuda"
     model = PointDepthScoreFusion()
     model = model.to(device)

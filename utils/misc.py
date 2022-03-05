@@ -7,20 +7,20 @@ import random
 import os
 #import wandb
 
-# def seed_everything(seed: str) -> None:
-#     """Set manual seed.
+def seed_everything(seed: str) -> None:
+    """Set manual seed.
 
-#     Args:
-#         seed (int): Supplied seed.
-#     """
+    Args:
+        seed (int): Supplied seed.
+    """
     
-#     random.seed(seed)
-#     os.environ['PYTHONHASHSEED'] = str(seed)
-#     np.random.seed(seed)
-#     torch.manual_seed(seed)
-#     torch.cuda.manual_seed(seed)
-#     torch.backends.cudnn.deterministic = True
-#     print(f'Set seed {seed}')
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    print(f'Set seed {seed}')
 
 
 def count_params(model: nn.Module) -> int:
