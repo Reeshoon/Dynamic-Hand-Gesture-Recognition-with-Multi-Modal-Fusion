@@ -30,7 +30,11 @@ def evaluate(model: nn.Module, dataloader: DataLoader, criterion: Callable, devi
 def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, criterion: Callable, optimizer: optim.Optimizer, n_epoch: int, device: str,schedulers: dict,config):
     if not os.path.isfile('./saved_files/'):
         os.mkdir('saved_files')
+
     best_acc = 0
+    patience = 5
+    wait = 0
+
     accuracies = []
     losses = []
     val_accuracies = []
@@ -74,7 +78,7 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
         
         log_dict = {"epoch": epoch, "time_per_epoch": time.time() - t0, "train_acc": acc/(len(train_loader.dataset)), "avg_loss_per_ep": avg_loss/len(train_loader)}
         log(log_dict, step,config)
-
+        wait+=1
         if (epoch+1) % 1 == 0:
             val_acc, val_loss = evaluate(model, val_loader, criterion, device)
             val_accuracies.append(val_acc)
@@ -85,8 +89,14 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
             if val_acc > best_acc:
                 best_acc = val_acc
                 best_model = model
+                wait = 0
                 save_path = os.path.join('./saved_files/', "best.pth")
                 save_model(epoch, save_path, model, optimizer, log_file) # save best val ckpt
+            if wait >= patience:
+                print("Val loss didn't improve over 5 epochs, so implementing early-stopping ")
+                break
+            
+            
 
     return accuracies, losses,val_accuracies,val_losses,best_model
 
