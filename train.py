@@ -92,9 +92,9 @@ def train(model: nn.Module, train_loader: DataLoader, val_loader: DataLoader, cr
                 wait = 0
                 save_path = os.path.join('./saved_files/', "best.pth")
                 save_model(epoch, save_path, model, optimizer, log_file) # save best val ckpt
-            if wait >= patience:
-                print("Val loss didn't improve over 5 epochs, so implementing early-stopping ")
-                break
+            # if wait >= patience:
+            #     print("Val loss didn't improve over 5 epochs, so implementing early-stopping ")
+            #     break
             
             
 

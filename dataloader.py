@@ -107,7 +107,7 @@ class SHRECLoader(data.Dataset):
                 image_sequence[i] = A.ReplayCompose.replay(data['replay'], image=image_sequence[i])["image"]
 
             #time shift augmentation
-            if np.random.random() >= 0.6:
+            if np.random.random() > 0.6:
                 return image_sequence
         
             shift = np.random.randint(-3, 3)
