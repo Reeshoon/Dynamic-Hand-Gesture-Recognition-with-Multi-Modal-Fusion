@@ -16,7 +16,7 @@ from utils.misc import count_params,seed_everything
 ################################
 
 def training_pipeline():
-    seed_everything(0)
+    seed_everything(42)
     device = "cuda"
     model = PointDepthScoreFusion()
     model = model.to(device)
@@ -83,7 +83,7 @@ def training_pipeline():
     }
 
     #with wandb.init(project='thesis-test-1', name='Depth Image Quantization', config=config):
-    accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 30, device,schedulers,config)
+    accuracies, losses,val_accuracies,val_losses,best_model= train(model, train_loader, val_loader, criterion, optimizer, 40, device,schedulers,config)
     test_acc, test_loss = test(best_model, criterion, test_loader,device)
 
     print("\nTest Accuracy :",test_acc,"\nTest Loss : ",test_loss)

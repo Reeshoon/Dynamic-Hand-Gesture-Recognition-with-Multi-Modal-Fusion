@@ -39,6 +39,5 @@ class PointDepthScoreFusion(nn.Module):
         x_depth = self.depth_crnn_model(x_depth)
 
         x_fused = (x_ptcloud + x_depth) / 2
-        #x_fused = x_depth
         return x_fused
 
