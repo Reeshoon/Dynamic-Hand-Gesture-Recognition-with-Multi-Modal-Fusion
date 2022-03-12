@@ -35,7 +35,7 @@ class SHRECLoader(data.Dataset):
         label14 = int(splitLine[-4]) - 1
 
         point_clouds = np.load(
-            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "Processed_", 2)
+            insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "128Points_Processed_", 2)
             + "/pts_label.npy")[:, :, :7]
 
         point_clouds = point_clouds[self.key_frame_sampling(len(point_clouds), self.framerate)]
@@ -150,7 +150,7 @@ class SHRECLoader(data.Dataset):
         return transform
     
     @staticmethod
-    def transform_init_depthim(phase,shift_limit: float=0.4, scale_limit:float=0.4, rotate_limit: int = 15, p : float = 0.6):
+    def transform_init_depthim(phase,shift_limit: float=0.2, scale_limit:float=0.2, rotate_limit: int = 20, p : float = 0.6):
         if phase == 'train':
             transform = A.ReplayCompose([
             A.ShiftScaleRotate(shift_limit=shift_limit, scale_limit=scale_limit, rotate_limit=rotate_limit, p=p)
