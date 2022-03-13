@@ -1,6 +1,7 @@
 """Straightforward example on setting up the score fusion model."""
 
 import torch
+import numpy as np
 from torch import nn, optim
 from models.motion import Motion
 from models.depthcrnn import DepthCRNN
@@ -39,6 +40,6 @@ class PointDepthScoreFusion(nn.Module):
         x_depth = self.depth_crnn_model(x_depth)
 
         #x_fused = (x_ptcloud + x_depth) / 2
-        x_fused = max(x_ptcloud,x_depth)
+        x_fused = torch.max(x_ptcloud,x_depth)
         return x_fused
 
