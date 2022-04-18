@@ -1,6 +1,7 @@
 import torch
 from torch import nn, optim
 from models.score_fusion_model import PointDepthScoreFusion
+from models.feature_fusion_model import PointDepthFeatureFusion
 from dataloader import SHRECLoader
 from train import train,test
 import math
@@ -18,7 +19,8 @@ from utils.misc import count_params,seed_everything
 def training_pipeline():
     seed_everything(0)
     device = "cuda"
-    model = PointDepthScoreFusion()
+    # model = PointDepthScoreFusion()
+    model = PointDepthFeatureFusion()
     model = model.to(device)
 
     print("Successfully created score fusion model")

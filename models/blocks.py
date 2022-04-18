@@ -58,7 +58,7 @@ class ConvBlock(nn.Module):
 class MLP(nn.Module):
     """MLP classifier head."""
 
-    def __init__(self, in_features: int, layers: list, drop_prb: float, use_norm: bool, actn_type: str = "relu", num_classes: int = 14):
+    def __init__(self, in_features: int, layers: list, drop_prb: float, use_norm: bool, actn_type: str = "relu", num_classes: int = 14, classify: bool = False):
         super().__init__()
         
         activation = get_activation(actn_type)
@@ -73,6 +73,7 @@ class MLP(nn.Module):
             ])
         self.fc = nn.Sequential(*self.fc)
 
+        self.classify = classify
         self.head = nn.Sequential(
             nn.LayerNorm(layers[-1]) if use_norm else nn.Identity(),
             nn.Linear(layers[-1], num_classes)
@@ -80,6 +81,7 @@ class MLP(nn.Module):
 
     def forward(self, x):
         x = self.fc(x)
-        x = self.head(x)
+        if self.classify:
+            x = self.head(x)
         return x
         
