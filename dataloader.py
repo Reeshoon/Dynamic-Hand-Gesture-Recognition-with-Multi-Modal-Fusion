@@ -25,7 +25,7 @@ class SHRECLoader(data.Dataset):
         if phase == "train":
             self.transform_ptclouds = self.transform_init_ptclouds("train")
             self.transform_depthim = self.transform_init_depthim("train")
-        elif phase == "test":
+        elif phase == "test" or phase == "validation":
             self.transform_ptclouds = self.transform_init_ptclouds("test")
             self.transform_depthim = self.transform_init_depthim("test")
 
@@ -60,6 +60,8 @@ class SHRECLoader(data.Dataset):
             inputs_path = prefix + "/train_gestures.txt"
         if self.phase == "test":
             inputs_path = prefix + "/test_gestures.txt"
+        if self.phase == "validation":
+            inputs_path = prefix + "/validation_gestures.txt"
         inputs_list = open(inputs_path).readlines()
         return inputs_list
 

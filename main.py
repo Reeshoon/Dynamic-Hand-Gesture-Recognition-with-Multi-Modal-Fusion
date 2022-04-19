@@ -38,10 +38,13 @@ def training_pipeline():
     criterion = LabelSmoothingLoss(num_classes= 14 , smoothing=0.1)
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
-    shrec = SHRECLoader(framerate=32)
-    train_size = int(0.8 * len(shrec))
-    val_size = len(shrec) - train_size
-    train_set, val_set = torch.utils.data.random_split(shrec, [train_size, val_size])
+    train_set = SHRECLoader(framerate=32)
+    val_set = SHRECLoader(framerate=32, phase='validation')
+    test_set = SHRECLoader(framerate=32,phase='test')
+    
+    # train_size = int(0.8 * len(shrec))
+    # val_size = len(shrec) - train_size
+    # train_set, val_set = torch.utils.data.random_split(shrec, [train_size, val_size])
 
     train_loader = torch.utils.data.DataLoader(
         dataset=train_set,
@@ -57,7 +60,6 @@ def training_pipeline():
         num_workers=0,
     )
 
-    test_set = SHRECLoader(framerate=32,phase='test')
     test_loader = torch.utils.data.DataLoader(
         dataset=test_set,
         shuffle=True,
