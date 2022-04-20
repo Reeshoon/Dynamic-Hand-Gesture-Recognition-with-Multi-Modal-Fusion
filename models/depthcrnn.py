@@ -16,7 +16,7 @@ class DepthCRNN(nn.Module):
             in_features = self.depth_cnn(torch.randn(1, 1, res_in[0], res_in[1])).numel()
 
         self.depth_lstm = nn.LSTM(in_features, lstm_units, num_layers=lstm_layers, dropout=drop_prb, bidirectional=use_bilstm, batch_first=True)
-        self.depth_mlp = MLP(T * lstm_units * (2 if use_bilstm else 1), mlp_layers, drop_prb, use_ln, actn_type, num_classes)
+        self.depth_mlp = MLP(T * lstm_units * (2 if use_bilstm else 1), mlp_layers, drop_prb, use_ln, actn_type, num_classes,classify=True) #remove classify=true for feature fusion
         
 
     def forward(self, x_dpt):
