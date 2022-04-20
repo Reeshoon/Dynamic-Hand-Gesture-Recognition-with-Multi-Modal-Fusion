@@ -84,9 +84,9 @@ class Motion(nn.Module):
         output = self.stage5(fea4)
         output = self.pool5(output)
         output = self.global_bn(output)
-        # output = self.stage6(output) # uncomment for score fusion
-        # return output.view(batchsize, self.num_classes) # uncomment for score fusion
-        return output.view(batchsize, 1024) # comment for score fusion
+        output = self.stage6(output) # uncomment for score fusion
+        return output.view(batchsize, self.num_classes) # uncomment for score fusion
+        #return output.view(batchsize, 1024) # comment for score fusion
 
     def select_ind(self, group_array, inputs, batchsize, in_dim, timestep, pts_num):
         ind = self.weight_select(group_array, pts_num)
