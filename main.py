@@ -17,7 +17,7 @@ from utils.misc import count_params,seed_everything
 ################################
 
 def training_pipeline():
-    seed_everything(787)
+    seed_everything(73)
     device = "cuda"
     model = PointDepthScoreFusion()
     #model = PointDepthFeatureFusion()
