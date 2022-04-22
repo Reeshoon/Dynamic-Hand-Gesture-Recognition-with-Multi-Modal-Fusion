@@ -58,7 +58,7 @@ class ConvBlock(nn.Module):
 class MLP(nn.Module):
     """MLP classifier head."""
 
-    def __init__(self, in_features: int, layers: list, drop_prb: float, use_norm: bool, actn_type: str = "relu", num_classes: int = 14, classify: bool = False):
+    def __init__(self, in_features: int, layers: list, drop_prb: float, use_norm: bool, actn_type: str = "relu", num_classes: int = 28, classify: bool = False):
         super().__init__()
         
         activation = get_activation(actn_type)
