@@ -13,7 +13,7 @@ class PointDepthScoreFusion(nn.Module):
         super().__init__()
 
         self.point_lstm_model=Motion(
-            num_classes=14,
+            num_classes=28,
             pts_size=128,
             offsets=False,
             topk=16, downsample=(2, 2, 2),
@@ -21,7 +21,7 @@ class PointDepthScoreFusion(nn.Module):
         )
 
         self.depth_crnn_model=DepthCRNN(
-            num_classes=14,
+            num_classes=28,
             conv_blocks=[8, 16, 32],
             res_in=[50, 50],
             T=32,

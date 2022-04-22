@@ -5,7 +5,7 @@ from typing import Tuple
 
 
 class DepthCRNN(nn.Module):
-    def __init__(self, conv_blocks: list = [8, 16, 32], res_in : Tuple[int, int] = (50, 50), T : int = 32, num_classes : int = 14,
+    def __init__(self, conv_blocks: list = [8, 16, 32], res_in : Tuple[int, int] = (50, 50), T : int = 32, num_classes : int = 28,
         drop_prb : float = 0.5, mlp_layers: list = [128], lstm_units: int = 128, lstm_layers: int = 2, use_bilstm: bool = True,
         actn_type: str = "swish", use_bn: bool = True, use_ln: bool = False, **kwargs) -> None:
         super().__init__()
