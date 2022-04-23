@@ -39,7 +39,7 @@ class PointDepthScoreFusion(nn.Module):
         x_ptcloud = self.point_lstm_model(x_ptcloud)
         x_depth = self.depth_crnn_model(x_depth)
 
-        x_fused = (x_ptcloud + x_depth) / 2
-        #x_fused = torch.max(x_ptcloud,x_depth)
+        #x_fused = (x_ptcloud + x_depth) / 2
+        x_fused = torch.max(x_ptcloud,x_depth)
         return x_fused
 
