@@ -35,7 +35,7 @@ def training_pipeline():
 
     ###########  Criterion Definition  ###########
     # criterion = nn.CrossEntropyLoss()
-    criterion = LabelSmoothingLoss(num_classes= 28 , smoothing=0.1) ##change number of classes
+    criterion = LabelSmoothingLoss(num_classes= 14 , smoothing=0.1) ##change number of classes
 
     # dataloader = dummy_data_loader(N=10, batch_size=2)
     train_set = SHRECLoader(framerate=32)

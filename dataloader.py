@@ -31,8 +31,8 @@ class SHRECLoader(data.Dataset):
 
     def __getitem__(self, index):
         splitLine = self.r.split(self.inputs_list[index])
-        label28 = int(splitLine[-3]) - 1
-        #label14 = int(splitLine[-4]) - 1
+        #label28 = int(splitLine[-3]) - 1
+        label14 = int(splitLine[-4]) - 1
 
         point_clouds = np.load(
             insert(self.prefix.format(splitLine[0], splitLine[1], splitLine[2], splitLine[3]), "Processed_", 2)
@@ -52,7 +52,7 @@ class SHRECLoader(data.Dataset):
 
         # label14 = torch.from_numpy(label14).long()
         # print(label14.dtype)
-        return point_clouds, depth_images, label28, self.inputs_list[index] ##change here for 28 labels
+        return point_clouds, depth_images, label14, self.inputs_list[index] ##change here for 28 labels
 
     def get_inputs_list(self):
         prefix = "./SHREC2017"
