@@ -21,6 +21,10 @@ The `PointDepthScoreFusion` class, implemented in [score_fusion_model.py](./mode
 
 The `PointDepthFeatureFusion` class, implemented in [feature_fusion_model.py](./models/feature_fusion_model.py), represents the feature-level fusion model.
 
+### Data Loader
+
+We provide a data loader script, [dataloader.py](./dataloader.py), which loads the depth sequences and point cloud data for training and testing.
+
 ## Getting Started
 
 To start training the recognition model, use the following command:
